@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bagh-Chal Login</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fafafa;
+      text-align: center;
+      padding: 30px;
+    }
+    .login-container, .game-container {
+      display: none;
+      margin-top: 50px;
+    }
+    .login-container.active, .game-container.active {
+      display: block;
+    }
+    input, button, select {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #game {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-template-rows: repeat(5, 80px);
+      gap: 2px;
+      margin: 20px auto;
+      width: 420px;
+    }
+    .cell {
+      background-color: #f0e4d7;
+      border: 1px solid #333;
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🐯 Bagh-Chal Game 🐐</h1>
+
+<!-- Login Section -->
+<div class="login-container active" id="login">
+  <h2>Welcome! Enter your name and choose a game mode:</h2>
+  <input type="text" id="playerName" placeholder="Enter your name" required />
+  <br>
+  <select id="modeSelect">
+    <option value="multiplayer">Multiplayer</option>
+    <option value="bot">Play with Bot</option>
+  </select>
+  <br>
+  <button onclick="startGame()">Start Game</button>
+</div>
+
+<!-- Game Section -->
+<div class="game-container" id="gameContainer">
+  <h2 id="playerHeader"></h2>
+  <div id="game"></div>
+  <div id="info"></div>
+</div>
+
+<script>
+const boardSize = 5;
+let board = [];
+let goatsToPlace = 20;
+let currentPlayer = 'goat';
+let selected = null;
+let gameMode = 'multiplayer';
+let playerName = '';
+let gameOver = false;
+
+function startGame() {
+  // Get inputs
+  playerName = document.getElementById('playerName').value.trim();
+  gameMode = document.getElementById('modeSelect').value;
+
+  if (!playerName) {
+    alert("Please enter your name.");
+    return;
+  }
+
+  // Hide login, show game
+  document.getElementById('login').classList.remove('active');
+  document.getElementById('gameContainer').classList.add('active');
+  document.getElementById('playerHeader').innerText = `Player: ${playerName} (${gameMode === 'bot' ? "vs Bot" : "Multiplayer"})`;
+
+  // Start game
+  goatsToPlace = 20;
+  currentPlayer = 'goat';
+  gameOver = false;
+  selected = null;
+  createBoard();
+  updateUI();
+}
+
+function createBoard() {
+  const container = document.getElementById('game');
+  container.innerHTML = '';
+  board = Array(boardSize).fill(null).map(() => Array(boardSize).fill(null));
+  board[0][0] = board[0][4] = board[4][0] = board[4][4] = 'tiger'; // 4 tigers
+
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.row = i;
+      cell.dataset.col = j;
+      cell.addEventListener('click', handleCellClick);
+      container.appendChild(cell);
+    }
+  }
+}
+
+function updateUI() {
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      const cell = document.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+      cell.textContent = board[i][j] === 'goat' ? '🐐' : board[i][j] === 'tiger' ? '🐯' : '';
+    }
+  }
+
+  document.getElementById('info').textContent = gameOver
+    ? "Game Over!"
+    : `${currentPlayer === 'goat' ? 'Goat 🐐' : 'Tiger 🐯'}'s turn`;
+
+  if (gameMode === 'bot' && currentPlayer === 'tiger') {
+    setTimeout(botMove, 500);
+  }
+}
+
+function handleCellClick(e) {
+  if (gameOver) return;
+
+  const row = parseInt(e.target.dataset.row);
+  const col = parseInt(e.target.dataset.col);
+
+  if (currentPlayer === 'goat') {
+    if (goatsToPlace > 0 && !board[row][col]) {
+      board[row][col] = 'goat';
+      goatsToPlace--;
+      currentPlayer = 'tiger';
+    } else if (board[row][col] === 'goat') {
+      selected = {row, col};
+    } else if (selected && !board[row][col] && isAdjacent(selected, {row, col})) {
+      board[row][col] = 'goat';
+      board[selected.row][selected.col] = null;
+      selected = null;
+      currentPlayer = 'tiger';
+    }
+  } else if (currentPlayer === 'tiger' && gameMode === 'multiplayer') {
+    if (board[row][col] === 'tiger') {
+      selected = {row, col};
+    } else if (selected && !board[row][col] && isAdjacent(selected, {row, col})) {
+      board[row][col] = 'tiger';
+      board[selected.row][selected.col] = null;
+      selected = null;
+      currentPlayer = 'goat';
+    }
+  }
+
+  updateUI();
+}
+
+function isAdjacent(a, b) {
+  const dx = Math.abs(a.row - b.row);
+  const dy = Math.abs(a.col - b.col);
+  return dx <= 1 && dy <= 1 && (dx + dy > 0);
+}
+
+function botMove() {
+  let tigers = [];
+
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = 0; j < boardSize; j++) {
+      if (board[i][j] === 'tiger') {
+        tigers.push({row: i, col: j});
+      }
+    }
+  }
+
+  for (let t of tigers) {
+    let moves = getAdjacentEmptyCells(t);
+    if (moves.length) {
+      let move = moves[Math.floor(Math.random() * moves.length)];
+      board[move.row][move.col] = 'tiger';
+      board[t.row][t.col] = null;
+      currentPlayer = 'goat';
+      updateUI();
+      return;
+    }
+  }
+
+  gameOver = true;
+  updateUI();
+}
+
+function getAdjacentEmptyCells(pos) {
+  let moves = [];
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      if (dx === 0 && dy === 0) continue;
+      let x = pos.row + dx;
+      let y = pos.col + dy;
+      if (x >= 0 && y >= 0 && x < boardSize && y < boardSize && !board[x][y]) {
+        moves.push({row: x, col: y});
+      }
+    }
+  }
+  return moves;
+}
+</script>
+
+</body>
+</html>

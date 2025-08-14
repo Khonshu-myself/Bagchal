@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bagh-Chal • Play</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header class="nav">
+  <h1>Bagh-Chal</h1>
+  <div class="muted">Play (Friends or Bot)</div>
+</header>
+
+<main class="wrap">
+  <section class="screen active" id="gameScreen">
+    <div class="card">
+      <div class="panel">
+        <div><strong>Player:</strong> <span id="playerName">—</span></div>
+        <div><strong>Mode:</strong> <span id="modeLabel">—</span></div>
+        <div><strong>Turn:</strong> <span id="turn">Goat</span></div>
+        <div><strong>Phase:</strong> <span id="phase">Placing (0/20)</span></div>
+        <div><strong>Goats Captured:</strong> <span id="captured">0</span></div>
+        <div class="spacer"></div>
+        <button id="resetBtn" class="btn">Reset</button>
+        <button id="logoutBtn" class="btn secondary" type="button">Logout</button>
+      </div>
+
+      <div id="board" class="board" aria-label="Bagh-Chal board"></div>
+      <p id="status" class="status"></p>
+
+      <details>
+        <summary>Quick rules</summary>
+        <ul>
+          <li>Goats place first (20 pieces total), then move one step per turn.</li>
+          <li>Tigers move 1 step, or jump over an adjacent goat to an empty point to capture.</li>
+          <li>Orthogonal moves only (kept simple for beginners).</li>
+        </ul>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">© 2025 Bagh-Chal Basics</footer>
+<script src="game.js"></script>
+</body>
+</html>

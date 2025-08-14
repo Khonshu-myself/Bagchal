@@ -1,9 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>HTML</title>
+  <meta charset="UTF-8" />
+  <title>Bagh-Chal • Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <b>Hypertext Markup language (html)</b> is the standard <a href="#">markup language</a>for documents designed to be displayed in a <a href="#">web browser</a>.It defines the content and structure of <a href="#">web content</a>. it is often associated by technologies such as <a href="#">Cascading Style Sheets</a>(css) and <a href="@">scripting languages</a> such as <a href="#">java Script</a>, a programming language.
+<header class="nav">
+  <h1>Bagh-Chal</h1>
+  <div class="muted">Login → Choose Mode → Play</div>
+</header>
+
+<main class="wrap">
+  <section class="screen active" id="loginScreen">
+    <div class="card grid" style="max-width:560px; margin:auto;">
+      <h2 style="margin:0;">Login</h2>
+      <p class="muted" style="margin-top:-6px;">Enter your name, choose how you want to play, then press Start.</p>
+      <label> Your name
+        <input id="username" type="text" placeholder="e.g., Jivan" required />
+      </label>
+      <label> Mode
+        <select id="modeSelect">
+          <option value="two" selected>2 Players (Friends on same device)</option>
+          <option value="bot">Vs Computer (Tigers)</option>
+        </select>
+      </label>
+      <div style="display:flex; gap:10px;">
+        <button id="startBtn" class="btn">Start Game</button>
+        <button id="clearBtn" class="btn secondary" type="button">Clear</button>
+      </div>
+    </div>
+
+    <div class="card" style="max-width:560px; margin:14px auto 0;">
+      <strong>How it works</strong>
+      <ul>
+        <li>Goats place 20 pieces (one per turn), then move one step.</li>
+        <li>Tigers move one step, or jump over a goat (orthogonal) to capture.</li>
+        <li>Tigers win after 5 captures. Goats win if all tigers are blocked.</li>
+        <li>In “Vs Computer”, you play Goats; computer plays Tigers.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">© 2025 Bagh-Chal Basics</footer>
+<script src="login.js"></script>
 </body>
 </html>
